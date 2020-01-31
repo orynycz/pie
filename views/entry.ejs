@@ -1,0 +1,72 @@
+<div class="data">
+    <!-- Category/Author -->
+    <br>
+    <div style="font-size:100%;font-weight:bold;">
+        <div class="row category" style="width:760px;">PIE</div>
+        <div class="row author">(<a href="Introduction-to-PIE-Lexicon-Pilot-1.0.pdf" target="_blank">Introduction</a>)</div>
+        <div class="row author">(<a href="info.html" target="_blank">Abbreviations &amp; References</a>)</div>
+        <div class="clear"></div>
+        <hr>
+        <div class="clear"></div>
+    </div>
+        <% if( type == 'category' ) { %>
+            <br><br>
+            <div>
+                <div style="font-size:100%;font-weight:bold;">
+                    <div class="row category" style="width:760px;" title="<%- pie %>" id="<%- pie %>"><%- pie %></div>
+                    <div class="row author" title="<%- reference %>"><%- reference %></div>
+                    <div class="row author" title="<%- attestation %>"><%- attestation %></div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        <% } %>
+
+        <% if( type == 'root' ) { %>
+            <div class="clear"></div>
+            <div class="inwords">
+                <div class="inword first" title="<%- pie %>" id="<%- pie %>">><%- pie %></div>
+                <div class="inword" title="<%- reference %>"><%- reference %></div>
+                <div class="inword" title="<%- attestation %>"><%- attestation %></div>
+            </div>
+            <div class="clear"></div>
+        <% } %>
+
+        <% if( type == 'word' ) { %>
+            <div class="words" >
+                <div class="row pie"><a onclick="togglePIE('<%- order %>')" id="<%- pie %>" name="<%- order %>" class="button" style="display:block;min-width:175px; margin-left:5px;"><span>PIE *</span><%- pie %></a></div>
+                <div class="row example"><abbr title="<%- language+' '+stem %>"><% if( foma.diffin ) { %><%- language+' '+foma.diffin %><% } else { %><span class="red"><%- language+'</span> '+stem %><% } %></abbr></div>
+                <div class="row translate" title="<%- morphology+' '+translation %>"><span class="translang">(<%- morphology %>)</span> <%- translation %></div>
+                <div class="row source"><%- reference %></div>
+                <div class="row fromword" title="<%- attestation %>"><%- attestation %></div>
+                <div class="clear"></div>
+            </div>
+            <div class="fomas" id="foma_<%-order%>" style="border-bottom:1px dotted grey;">
+            <%
+                if( !foma.diffin ) {
+                    %><span class="red">Language not found or error while translating! <%- foma.output %></span><%
+                }
+                for(var o in foma.trace) {
+                    var parsed = foma.trace[o];
+                    if( !parsed )
+                        continue;
+                    var next = parseInt(o)+1;
+                    var outword = foma.trace[ next ] ? foma.trace[ next ].word : '';
+                    var last = parseInt(o)+2;
+                    last = foma.trace[ last ] ? false : true;
+                    var rule = last ? '<abbr title="'+language+' '+outword+'">'+language+' '+foma.diffout+'</abbr>' : '*'+outword;
+                    if( outword ) {
+                        %>
+                        <div class="hover clear">
+                            <div class="row pie"><%-next%>. <% if( next == 1 ) { %>PIE *<% } %><%-parsed.word%></div>
+                            <div class="row pie"><%-parsed.rule%></div>
+                            <div class="row translate"><%-parsed.comment%></div>
+                            <div class="row pie"><%-parsed.ruleid%> → <%-rule%></div>
+                            <div class="row pie"><%-parsed.author%></div>
+                        </div>
+                        <%
+                    }
+                } %>
+                <div class="clear"></div>
+            </div>
+        <% } %>
