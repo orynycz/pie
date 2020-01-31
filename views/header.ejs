@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Proto-Indo-European Lexicon (PIE Lexicon)</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=2" />
+
+    <meta name="description" content="The generative etymological dictionary of Indo-European languages">
+    <meta name="keywords" content="proto,indo,european,lexicon,generative,etymological,dictionary,languages">
+    <meta name="author" content="University of Helsinki">
+
+    <meta name="robots" content="index, follow">
+
+    <meta name="copyright" content="University of Helsinki 2014-<%-new Date().getFullYear()%>">
+    <meta name="distribution" content="Global">
+
+    <meta property="og:image" content="http://pielexicon.hum.helsinki.fi/logo/pielogo.jpg">
+    <meta property="og:image:width" content="470">
+    <meta property="og:image:height" content="246">
+
+    <meta property="og:title" content="Proto-Indo-European Lexicon">
+    <meta property="og:description" content="The generative etymological dictionary of Indo-European languages">
+
+    <link media="all" rel="stylesheet" type="text/css" href="stylesheets/style.css" />
+
+    <link rel="shortcut icon" href="/favicon.ico?pie" type="image/x-icon">
+
+    <script src="javascripts/jquery-1.11.1.min.js"></script>
+
+    <script src="javascripts/deval.js"></script>
+
+    <script src="handsontable-0.12.5/dist/handsontable.full.js"></script>
+    <link rel="stylesheet" media="screen" href="handsontable-0.12.5/dist/handsontable.full.css">
+
+    <script>
+        /**
+         * Toggle language
+         */
+        function toggle(hash, elem) {
+            var e = jQuery('#'+hash);
+            var offset = jQuery(elem).offset();
+            e.toggle();
+            e.offset({top: offset.top+20, left: offset.left });
+        }
+        /**
+         * Toggle Foma translations
+         */
+        function togglePIE(hash) {
+            jQuery('#foma_'+hash).toggle();
+        }
+        // @see http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
+        $(document).delegate('textarea', 'keydown', function(e) {
+          var keyCode = e.keyCode || e.which;
+          if (keyCode == 9) {
+            e.preventDefault();
+            var start = $(this).get(0).selectionStart;
+            var end = $(this).get(0).selectionEnd;
+            // set textarea value to: text before caret + tab + text after caret
+            $(this).val($(this).val().substring(0, start)
+                        + "\t"
+                        + $(this).val().substring(end));
+            // put caret at right position again
+            $(this).get(0).selectionStart =
+            $(this).get(0).selectionEnd = start + 1;
+          }
+        });
+    </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-55157633-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+<body spellcheck="false">
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&appId=490413904312806&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<%
+var alphaC = '';
+if( alpha ) {
+    alphaC = alpha.toString().split('.');
+    alphaC = alphaC.shift();
+}
+%>
+<div class="padding">
+    <!-- HEADER START -->
+    <% if( user ) { %>
+    <div style="position:absolute;width:1100px;top:-5px;text-align:center; left:50%; margin-left:-530px; z-index:9999;">
+        <div style="margin-left:-100px; color:grey; font-size:14px;">
+            <div style="padding:5px; padding-top:10px; border-radius:5px; border:1px dotted grey; background:#f0f0f0; letter-spacing:1px;">
+                    <!-- SUPERUSER -->
+                    Admin :
+                    <% if( user.superuser ) { %>
+                    <a onclick="toggleUsers();" style="cursor:pointer;">Users</a>,
+                    <% } %>
+                    <a onclick="toggleMotd();" style="cursor:pointer;">Motd</a>,
+                    <a onclick="toggleLanguages();" style="cursor:pointer;">Languages</a>
+                    <b>&middot;</b>
+                    Rules :
+                    <a onclick="toggleRuleDefinitions();" style="cursor:pointer;">Definitions</a>,
+                    <a onclick="createRuleChainView();" style="cursor:pointer;">Chains</a>,<!-- toggleRuleChains();
+                    <a onclick="toggleRuleCombined();" style="cursor:pointer;">Combined</a>,-->
+                    <a href="backupLanguagesAndRules">Backup</a>
+                    <b>&middot;</b>
+                    Data : <a href="exportJSON">Export</a>,
+                    <a onclick="toggleImport();" style="cursor:pointer;">Import</a>
+                    <b>&middot;</b>
+                    <%- user.username %> :
+                    <a href="/logout">Logout</a>
+                    <script>
+                        var ids = 0;
+                        function createRuleChainView() {
+                            ids++;
+                            var id = 'Chain-'+ids;
+                            var iframe = document.createElement('iframe');
+                            iframe.id = id;
+                            iframe.width = '100%';
+                            iframe.height = 460;
+                            iframe.border = 0;
+                            iframe.style.border = 'none';
+                            iframe.style.overflow = 'hidden';
+                            iframe.style.padding = 0;
+                            iframe.style.margin = 0;
+                            //iframe.sandbox = 'allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals';
+                            iframe.setAttribute('scrolling', 'auto');
+                            iframe.setAttribute('src', 'ruleChainsPage');
+                            var blocks = document.getElementById('blocks');
+                            blocks.appendChild( iframe );
+                        }
+                    </script>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div id="blocks">
+            <!-- USERS -->
+            <% include users %>
+            <!-- LANGUAGES -->
+            <% include languages %>
+            <!-- MOTD -->
+            <% include motd-edit %>
+            <!-- RULES -->
+            <% include ruleDefinitions %>
+            <% include ruleChains %>
+            <% include ruleCombined %>
+            <!-- IMPORT/EXPORT -->
+            <% include import %>
+        </div>
+    </div>
+    <% } %>
+    <div class="header">
+        <div class="topics" style="width:1400px;">
+            <div style="width:220px;float:left;text-align:center;">
+                <br>
+                <a href="/"><img src="pie-logo-110.jpg" style="padding-bottom:10px;"></a><br>
+                <a href="about.html" target="_blank">PIE Lexicon Project</a><br>
+                <a href="https://helda.helsinki.fi/handle/10138/41760" target="_blank">System PIE (Pyysalo 2013)</a><br>
+                <a href="https://code.google.com/p/foma/" target="_blank">Foma (Hulden 2009)</a><br>
+                <a href="https://kitwiki.csc.fi/twiki/bin/view/FinCLARIN/FinClarinHallintoUudetKielivaratPIELexicon" target="_blank">FIN-CLARIN</a><br><br>
+                <a href="http://edil.qub.ac.uk" target="_blank"><img src="partner-icons/favicon_edil_qub_ac_uk.png"></a>
+                <a href="http://www.univie.ac.at/tocharian/" target="_blank"><img src="partner-icons/favicon_www_univie_ac_at_tocharian.png"></a>
+                <a href="http://www.perseus.tufts.edu/hopper/" target="_blank"><img src="partner-icons/favicon_www_perseus_tufts_edu_hopper.png"></a>
+                <a href="http://www.geiriadur.ac.uk" target="_blank"><img src="partner-icons/favicon_www_geiriadur_ac_uk.png"></a>
+                <a href="http://bosworth.ff.cuni.cz" target="_blank"><img src="partner-icons/favicon_bosworth_ff_cuni_cz.png"></a>
+                <a href="http://www.hf.uio.no/ifikk/english/research/projects/damos/" target="_blank"><img src="partner-icons/favicon_hf_uio_no.png"></a>
+                <a href="/"><img src="partner-icons/favicon_pielexicon-0.png"></a>
+                <a href="http://pielinguistics.org/" target="_blank"><img src="partner-icons/pielinguistics-logo-16.png"></a>
+            </div>
+            <div style="width:740px;float:left;text-align:center;">
+                <!-- TITLE -->
+                <h1><a href="/">Proto-Indo-European Lexicon</a></h1>
+                <h2>The generative etymological dictionary of Indo-European languages</h2>
+                <p><span style="padding-left:10px; font-size:18px;">The Proto-Indo-European Phoneme Inventory</span></p>
+
+                <!-- ALPHABETS -->
+                <div style="width:450px;margin-left:145px;">
+                    <ul class="tags">
+                        <% for(var a in alphabetsOrder) { %>
+                            <% if( !user ) {
+                            var aOrderC = alphabetsOrder[a].toString().split('.');
+                            aOrderC = aOrderC.shift();
+                            %>
+                                <li><a href="?alpha=<%= alphabetsOrder[a] %>"<% if( alphaC == aOrderC ) { %> class="alpha"<% } %>>*<%- a %></a></li>
+                            <% } else if( user ) { %>
+                                <li><a href="?alpha=<%= alphabetsOrder[a] %>"<% if( alpha == alphabetsOrder[a] ) { %> class="alpha"<% } %>>*<%- a %></a></li>
+                            <% } else { %>
+                                <li><span>*<%- a %></span></li>
+                            <% } %>
+                        <% } %>
+                    </ul>
+                    <div style="clear:both;"></div>
+                    <span style="color:grey; line-height:20px;"<% if( alpha == 'ALL' && view !== 'mismatch' ) { %> class="alpha"<% } %>><a href="?alpha=ALL">Show the entire data in a single page</a></span>
+                    &nbsp; | &nbsp;
+                    <span style="color:grey; line-height:20px;"<% if( alpha == 'ALL' && view === 'mismatch' ) { %> class="alpha"<% } %>><a href="?alpha=ALL&view=mismatch">Show all mismatches</a></span>
+                    <div style="clear:both;"></div>
+                </div>
+
+                <p><span style="padding-left:10px;"><a href="http://www.helsinki.fi/university/" target="_blank" style="font-size:12px;">&copy; 2014-<%-new Date().getFullYear()%> University of Helsinki</a></span></p>
+                <span class="grey">"Durch zweier Zeugen Mund wird alle Wahrheit kund" — August Fick</span><br><span>(PRINCIPLE of POSTULATION)</span>
+                <div class="clear"></div>
+                <br>
+            </div>
+            <div style="width:220px;float:left;text-align:center;">
+                <br>
+                <a href="http://www.helsinki.fi/hum/english/" target="_blank"><img src="hum-tdk-logo-englanti.jpg" style="padding-bottom:10px;"></a><br>
+                <a href="http://www.helsinki.fi/modernlanguages/" target="_blank">Department of Modern Languages</a><br>
+                <a href="http://www.helsinki.fi/worldcultures/" target="_blank">Department of World Cultures</a><br>
+                <a href="http://www.helsinki.fi/indoeuropeistics/" target="_blank">Indo-European Studies</a><br>
+                <!-- <a hreF="http://www.helsinki.fi/hum/english/" target="_blank">Faculty of Arts</a><br> -->
+                <a href="" id="contact">Contact PIE Lexicon Project</a>
+                <script>
+                    jQuery('#contact').attr('href', 'mai'+'lto'+':pie-lexi'+'con@h'+'elsinki.f'+'i');
+                </script>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="clear"></div>
+
+        <%
+        // STATUS AND OUTPUT FOR EDIT
+        if( edit ) { %>
+            <div id="status" style="color:green"></div>
+            <div id="output" style="color:red"></div>
+        <% } %>
