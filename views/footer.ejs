@@ -1,0 +1,91 @@
+    <div class="clear"></div>
+    <p class="grey footer"></p>
+    <p class="license"><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"></a> <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">The PIE Lexicon Project</span> licenses its data, linguistic results and finite-state encoded rules under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike (CC BY-SA) license</a>.</p>
+    <p style="text-align:center;">
+        <a href="https://www.facebook.com/pielexicon" target="_blank"><img src="images/facebook-icon.png"></a>
+        <a href="https://twitter.com/PIELexicon" target="_blank"><img src="images/twitter-icon.png"></a>
+    </p>
+    <% if( !alpha ) { %>
+    <p style="text-align:center">
+        <span class="grey">Versions: <a href="/">1.2.</a> (current) | <a href="/1.1">1.1.</a> | <a href="/1.0">1.0.</span>
+    </p>
+    <% } else { %>
+    <p class="grey footer"></p>
+    <p class="grey footer"></p>
+    <% } %>
+    <div class="clear"></div>
+
+    <!-- FLOATING FOOTER START -->
+    <% if( alpha ) { %>
+    <div class="columns floatingFooter">
+        <!-- Show/hide columns -->
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="inwords" id="inwords" onchange="$('.'+this.name).toggle();">
+            <label for="inwords">Root matrix</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="words" id="words" onchange="$('.'+this.name).toggle();">
+            <label for="words">Data</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="pie" id="pie" onchange="$('.words > .'+this.name).toggle();">
+            <label for="pie">Reconstruction</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="example" id="example" onchange="$('.words > .'+this.name).toggle();">
+            <label for="example">Stems</label>
+        </div>
+        <!-- <div class="head filter">
+            <input type="checkbox" checked="checked" name="difference" id="difference" onchange="$('.words > .'+this.name).toggle();">
+            <label for="difference">Diff</label>
+        </div> -->
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="translang" id="translang" onchange="$('.words > .translate > .'+this.name).toggle();">
+            <label for="translang">Morphology</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="translate" id="translate" onchange="$('.words > .'+this.name).toggle();">
+            <label for="translate">Translation</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="source" id="source" onchange="$('.words > .'+this.name).toggle();">
+            <label for="source">Reference</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" checked="checked" name="fromword" id="fromword" onchange="$('.words > .'+this.name).toggle();">
+            <label for="fromword">Attestation</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" name="chains" id="chains" onchange="toggleChains();"<% if( view == 'chains' ) { %> checked<% } %>>
+            <label for="chains">Chains</label>
+        </div>
+        <div class="head filter">
+            <input type="checkbox" name="mismatch" id="mismatch" onchange="toggleMismatch();"<% if( view == 'mismatch' ) { %> checked<% } %>>
+            <label for="mismatch">Mismatches</label>
+        </div>
+        <script>
+            function toggleChains() {
+                //$('.fomas').toggle();
+                if( url.view == 'chains' ) {
+                    location.href = location.href.replace('&view=chains', '');
+                } else {
+                    location.href = location.href+'&view=chains';
+                }
+            }
+            function toggleMismatch() {
+                //$('.fomas').toggle();
+                if( url.view == 'mismatch' ) {
+                    location.href = location.href.replace('&view=mismatch', '');
+                } else {
+                    location.href = location.href+'&view=mismatch';
+                }
+            }
+        </script>
+        <!-- Virtual Keyboard search/rules -->
+        <% include keyboard %>
+    </div>
+    <% } %>
+
+</div>
+</body>
+</html>
